@@ -2,9 +2,7 @@ import sys
 import datetime
 import time
 import argparse
-import configparser
 import os
-import subprocess
 from pyjs8call import Client
 
 os.environ["QT_QPA_PLATFORM"] = "xcb"
@@ -18,12 +16,18 @@ FREQUENCY_MAP = {
 
 
 def rx_callback(msg, log_file=None):
-    if msg and msg.text:
-        timestamp = time.strftime(
-            "%Y-%m-%d %H:%M:%S", time.localtime(msg.timestamp))
-        output_str = f"[{timestamp}] {msg.origin} ({msg.snr}dB): {msg.text}"
+    timestamp = time.strftime(
+        "%Y-%m-%d %H:%M:%S",
+        time.localtime(getattr(msg, "timestamp", time.time())),
+    )
+    origin = getattr(msg, "origin", "-")
+    snr = getattr(msg, "snr", "-")
+    text = getattr(msg, "text", "")
 
-        # Print to Console
+    output_str = f"[{timestamp}] {origin} ({snr}dB): {text}"
+
+    # Print to Console if there's text
+    if text:
         print(output_str)
 
     # Log to File if requested
@@ -31,8 +35,8 @@ def rx_callback(msg, log_file=None):
         try:
             with open(log_file, "a+", encoding="utf-8") as f:
                 f.write(output_str + "\n")
-        except Exception as e:
-            print(f"[LOG ERROR] Could not write to file: {e}")
+        except Exception as exc:  # pylint: disable=broad-except
+            print(f"[LOG ERROR] Could not write to file: {exc}")
 
 
 def set_freq(args, js8):
@@ -75,8 +79,8 @@ def main():
 
         while not js8.online and attempts < max_retries:
             print(
-                f"Waiting for JS8Call API... (Attempt {
-                    attempts + 1}/{max_retries})")
+                f"Waiting for JS8Call API... (Attempt {attempts + 1}/{max_retries})"
+            )
             time.sleep(1)
             attempts += 1
 
