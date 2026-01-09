@@ -1,5 +1,7 @@
 # js8_call_scripts
 
+[![Pylint](https://github.com/alexvesey/js8_call_scripts/actions/workflows/pylint.yml/badge.svg?branch=master)](https://github.com/alexvesey/js8_call_scripts/actions/workflows/pylint.yml)
+
 ## Venv Setup Instructions
 
 You will only need to do this once when setting up the project initially
