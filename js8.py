@@ -1,3 +1,9 @@
+"""Simple JS8Call monitor script.
+
+Provides a small CLI that starts a headless JS8Call client, logs
+incoming messages and can set the operating frequency.
+"""
+
 import sys
 import datetime
 import time
@@ -16,6 +22,12 @@ FREQUENCY_MAP = {
 
 
 def rx_callback(msg, log_file=None):
+    """Handle an incoming message and optionally log it.
+
+    msg may be None or missing attributes; this function builds a
+    safe output string and writes it to the console and/or a log
+    file specified by ``log_file``.
+    """
     timestamp = time.strftime(
         "%Y-%m-%d %H:%M:%S",
         time.localtime(getattr(msg, "timestamp", time.time())),
@@ -40,6 +52,11 @@ def rx_callback(msg, log_file=None):
 
 
 def set_freq(args, js8):
+    """Set the JS8Call frequency based on parsed CLI arguments.
+
+    ``args`` is the argparse Namespace containing ``gn`` and ``std``
+    boolean flags. ``js8`` is the Client instance to configure.
+    """
     if args.gn:
         freq = FREQUENCY_MAP.get('gn')
         if freq:
@@ -53,6 +70,8 @@ def set_freq(args, js8):
 
 
 def main():
+    """CLI entrypoint: parse args, start client, and run loop."""
+
     parser = argparse.ArgumentParser(description="JS8Call Monitor Script")
     parser.add_argument(
         '--gn', action='store_true', help='set the frequency to the ghost net frequency')
@@ -62,7 +81,7 @@ def main():
 
     js8 = Client()
 
-    with open('js8call.log', 'a+') as f:
+    with open('js8call.log', 'a+', encoding='utf-8') as f:
         now = datetime.datetime.now()
         f.write(f'\n New log starting {now}\n')
 
