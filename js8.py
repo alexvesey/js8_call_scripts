@@ -85,7 +85,7 @@ def main():
             attempts += 1
 
         set_freq(args, js8)
-    except Exception as e:
+    except Exception as e: # pylint: disable=broad-except
         print(f"Error starting JS8Call: {e}")
         sys.exit(1)
 
